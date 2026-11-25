@@ -1,0 +1,29 @@
+[workspace]
+resolver = "2"
+members = ["crates/qimist-dsp", "plugin", "xtask"]
+exclude = ["vendor"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "GPL-3.0-or-later"
+authors = ["Qimist"]
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+strip = "symbols"
+
+# DSP code is slow in debug builds; keep tests usable.
+[profile.dev.package.qimist-dsp]
+opt-level = 3
+
+[profile.test]
+opt-level = 2
+
+# Patched nih-plug (vendor/nih-plug): fixes a JACK-under-PipeWire deadlock at startup in the
+# standalone backend. See the "Qimist patch" comment in src/wrapper/standalone/backend/jack.rs.
+[patch."https://github.com/robbert-vdh/nih-plug.git"]
+nih_plug = { path = "vendor/nih-plug" }
+nih_plug_egui = { path = "vendor/nih-plug/nih_plug_egui" }
+nih_plug_xtask = { path = "vendor/nih-plug/nih_plug_xtask" }

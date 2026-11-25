@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Qimist UI</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=Share+Tech+Mono&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0a0c; --panel: #1d1a20; --panel2: #151317; --screen: #0a0a0c;
+    --line: #2c2830; --cream: #e9dfc8; --muted: #a89c86; --dim: #6b6358;
+    --cyan: #3ee8ff; --amber: #ffb340; --red: #ff5a4f; --knobcap: #2a262d;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--cream); font-family: Inter, system-ui, sans-serif;
+         display: flex; justify-content: center; padding: 24px 0; min-width: 1300px; }
+  button { font: inherit; cursor: pointer; }
+  .mono { font-family: 'Share Tech Mono', monospace; }
+  .osw { font-family: Oswald, sans-serif; letter-spacing: .18em; }
+  .plugin { width: 1280px; height: 910px; display: flex; border-radius: 10px; overflow: hidden; box-shadow: 0 20px 60px #000; }
+  .wood { width: 16px; flex-shrink: 0; background-color: #3a2418;
+          background-image: repeating-linear-gradient(90deg, rgba(0,0,0,.18) 0 1px, transparent 1px 4px); }
+  .main { flex: 1; min-width: 0; display: flex; flex-direction: column; background: #151317; }
+  .header { height: 68px; padding: 0 24px; display: flex; align-items: center; gap: 24px; background: var(--panel); border-bottom: 1px solid var(--line); }
+  .body { flex: 1; padding: 16px 20px 18px; display: flex; flex-direction: column; gap: 14px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+  .title { font-family: Oswald, sans-serif; font-size: 12px; letter-spacing: .22em; }
+  .row { display: flex; align-items: center; gap: 8px; }
+  .between { display: flex; justify-content: space-between; align-items: center; }
+  .seg { display: flex; gap: 4px; padding: 4px; background: #0f0e11; border: 1px solid var(--line); border-radius: 8px; }
+  .pill { height: 26px; padding: 0 12px; border-radius: 5px; font-family: Oswald, sans-serif; font-size: 11px; letter-spacing: .14em;
+          border: 1px solid transparent; background: transparent; color: var(--muted); }
+  .pill.on { border-color: var(--cyan); color: var(--cyan); background: rgba(62,232,255,.08); box-shadow: 0 0 10px rgba(62,232,255,.25); }
+  .pill.amber.on { border-color: var(--amber); color: var(--amber); background: rgba(255,179,64,.08); box-shadow: 0 0 10px rgba(255,179,64,.25); }
+  .btn { height: 30px; padding: 0 12px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel2); color: var(--cream);
+         font-family: Oswald, sans-serif; font-size: 11px; letter-spacing: .14em; display: flex; align-items: center; gap: 6px; }
+  .btn.rec.on { border-color: var(--red); color: var(--red); background: rgba(255,90,79,.1); }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--red); }
+  .btn.rec.on .dot { box-shadow: 0 0 8px var(--red); animation: blink 1s infinite; }
+  @keyframes blink { 50% { opacity: .3; } }
+  .knob { display: flex; flex-direction: column; align-items: center; gap: 2px; user-select: none; }
+  .knob svg { cursor: ns-resize; }
+  .knob .val { font-family: 'Share Tech Mono', monospace; font-size: 11px; color: var(--cream); }
+  .knob .lbl { font-family: Oswald, sans-serif; font-size: 9px; letter-spacing: .14em; color: var(--muted); }
+  .glow-c { color: var(--cyan); text-shadow: 0 0 18px rgba(62,232,255,.45); }
+  .glow-a { color: var(--amber); text-shadow: 0 0 14px rgba(255,179,64,.4); }
+  .wave { width: 30px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 4px; padding: 0;
+          border: 1px solid var(--line); background: #0f0e11; color: var(--muted); }
+  .wave.on { border-color: var(--cyan); background: rgba(62,232,255,.1); color: var(--cyan); }
+  .switch { width: 44px; height: 24px; border-radius: 12px; padding: 0; position: relative; border: 1px solid #3a353e; background: #0f0e11; }
+  .switch span { position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: var(--dim); transition: left .15s; }
+  .switch.on { border-color: var(--cyan); background: rgba(62,232,255,.15); }
+  .switch.on span { left: 23px; background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
+  .led { width: 8px; height: 8px; border-radius: 50%; background: #2a262d; display: inline-block; }
+  .led.on { background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
+  #lockBadge { color: var(--muted); border: 1px solid var(--line); }
+  #lockBadge.on { color: var(--cyan); border-color: var(--cyan); box-shadow: 0 0 8px rgba(62,232,255,.3); }
+  .meterbox { position: relative; height: 124px; border-radius: 7px; overflow: hidden; border: 3px solid #0a0a0c;
+              background: radial-gradient(ellipse at 50% 120%, #fff4d6 0%, #efe2c2 55%, #d9c9a3 100%);
+              box-shadow: inset 0 0 18px rgba(80,50,10,.35); }
+  .glass { position: absolute; inset: 0; pointer-events: none;
+           background: linear-gradient(160deg, rgba(255,255,255,.35) 0%, rgba(255,255,255,0) 38%); }
+  .screw { position: absolute; width: 7px; height: 7px; border-radius: 50%; background: #8a7a62;
+           box-shadow: inset 0 0 0 1px #5a4c38; }
+  .screw::after { content: ''; position: absolute; left: 1px; right: 1px; top: 3px; height: 1px; background: #4a3d2c; transform: rotate(35deg); }
+  .lamp { position: absolute; right: 18px; bottom: 12px; width: 10px; height: 10px; border-radius: 50%; background: #6b5d47; border: 1px solid #4a3d2c; }
+  .lamp.on { background: var(--cyan); box-shadow: 0 0 10px var(--cyan), 0 0 22px var(--cyan); }
+  .trace { flex: 1; position: relative; background: var(--screen); border: 1px solid #221f25; border-radius: 6px; overflow: hidden; }
+  .kbd { position: relative; height: 26px; display: flex; gap: 2px; }
+  .kbd .w { flex: 1; border-radius: 0 0 3px 3px; background: #d9cfb8; position: relative; }
+  .kbd .w span { position: absolute; bottom: 2px; left: 0; right: 0; text-align: center; font-family: 'Share Tech Mono'; font-size: 8px; color: #5a4f44; }
+  .kbd .b { position: absolute; top: 0; height: 15px; width: 4.5%; border-radius: 0 0 2px 2px; background: #1a171c; border: 1px solid #000; z-index: 1; }
+  .kbd .on { background: var(--cyan) !important; box-shadow: 0 0 12px var(--cyan); }
+  .bar { flex: 1; height: 5px; border-radius: 3px; background: var(--screen); overflow: hidden; }
+  .bar div { height: 5px; width: 50%; background: var(--cyan); transition: width .1s; }
+  .mlbl { font-size: 9px; color: var(--muted); width: 72px; letter-spacing: .14em; }
+  .mval { font-size: 11px; width: 30px; text-align: right; }
+  .hint { position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); font-size: 12px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="plugin">
+  <div class="wood"></div>
+  <div class="main">
+
+    <!-- HEADER -->
+    <div class="header">
+      <div style="min-width:170px">
+        <div style="font-family:Oswald;font-weight:600;font-size:26px;letter-spacing:.12em;line-height:1"><span style="color:var(--cyan)">VOX</span>FORGE</div>
+        <div class="osw" style="font-size:10px;letter-spacing:.32em;color:var(--muted)">VOICE · TO · MIDI · SYNTH</div>
+      </div>
+      <div class="seg" id="modes"></div>
+      <div class="row">
+        <button class="btn" aria-label="Previous preset">&#8249;</button>
+        <div class="mono" style="width:220px;height:32px;padding:0 12px;border-radius:6px;background:var(--screen);border:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;color:var(--amber)">
+          <span>NEON HUM LEAD</span><span style="color:var(--muted);font-size:11px">012</span></div>
+        <button class="btn" aria-label="Next preset">&#8250;</button>
+        <button class="btn">SAVE</button>
+      </div>
+      <div style="flex:1"></div>
+      <div>
+        <div class="osw" style="font-size:10px;color:var(--muted);margin-bottom:5px">MIC IN</div>
+        <div class="row" style="gap:2px" id="leds"></div>
+      </div>
+      <div class="mono" style="text-align:right">
+        <div style="font-size:15px">120.00 BPM</div>
+        <div style="font-size:10px;color:var(--muted)">HOST SYNC · 4/4</div>
+      </div>
+      <div class="row" style="padding:6px 10px;border-radius:6px;border:1px solid var(--line);background:#0f0e11">
+        <div id="midiLed" style="width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan)"></div>
+        <span class="osw" style="font-size:11px">MIDI OUT</span>
+      </div>
+    </div>
+
+    <div class="body">
+      <!-- ROW 1 -->
+      <div style="height:350px;display:grid;grid-template-columns:420px 1fr 290px;gap:14px">
+        <!-- tuner -->
+        <div class="card tuner" style="padding:12px 14px;gap:8px">
+          <div class="between">
+            <div class="title" style="font-size:13px">PITCH DETECTOR</div>
+            <div class="row" style="gap:10px">
+              <span class="mono" style="font-size:10px;color:var(--muted)">pYIN · HMM · 48k</span>
+              <span class="row" style="gap:5px"><span id="voicedLed" class="led"></span><span class="osw" id="voicedLbl" style="font-size:10px">VOICED</span></span>
+              <span class="mono" id="lockBadge" style="font-size:11px;padding:2px 8px;border-radius:4px">LOCKED</span>
+            </div>
+          </div>
+
+          <!-- vintage meter -->
+          <div class="meterbox">
+            <svg width="100%" height="124" viewBox="0 0 392 124" id="meter" aria-label="Cents meter"></svg>
+            <div class="glass"></div>
+            <span class="screw" style="left:6px;top:6px"></span><span class="screw" style="right:6px;top:6px"></span>
+            <span class="screw" style="left:6px;bottom:6px"></span><span class="screw" style="right:6px;bottom:6px"></span>
+            <div id="tuneLamp" class="lamp"></div>
+          </div>
+
+          <!-- note + pitch trace -->
+          <div style="display:flex;gap:10px;height:82px">
+            <div style="width:124px;display:flex;flex-direction:column;justify-content:center;gap:4px">
+              <div class="row" style="align-items:flex-end;gap:2px">
+                <span class="mono glow-c" id="noteName" style="font-size:54px;line-height:.85">A</span>
+                <span class="mono" style="display:flex;flex-direction:column;line-height:1">
+                  <span id="noteAcc" class="glow-c" style="font-size:22px;height:22px"></span>
+                  <span id="noteOct" style="font-size:20px;color:var(--cream)">4</span>
+                </span>
+              </div>
+              <div class="mono" style="font-size:11px;color:var(--muted)"><span id="hz" style="color:var(--cream)">440.0</span> Hz · <span id="cents" style="color:var(--amber)">+0¢</span></div>
+              <div class="mono" style="font-size:10px;color:var(--muted)">MIDI <span id="midiNum" style="color:var(--cream)">69</span> · VEL <span id="vel" style="color:var(--cream)">96</span></div>
+            </div>
+            <div class="trace">
+              <svg id="trace" width="100%" height="100%" viewBox="0 0 240 82" preserveAspectRatio="none"></svg>
+              <div class="mono" id="traceLbls" style="position:absolute;right:4px;top:0;bottom:0;font-size:8px;color:var(--muted)"></div>
+              <div class="osw" style="position:absolute;left:6px;top:3px;font-size:8px;color:var(--muted)">PITCH · 3 S</div>
+            </div>
+          </div>
+
+          <!-- one-octave keyboard -->
+          <div id="kbd" class="kbd"></div>
+
+          <!-- meters -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 14px">
+            <div class="row"><span class="osw mlbl">CONFIDENCE</span><div class="bar"><div id="confBar"></div></div><span class="mono mval" id="conf">94%</span></div>
+            <div class="row"><span class="osw mlbl">STABILITY</span><div class="bar"><div id="stabBar" style="background:var(--amber)"></div></div><span class="mono mval" id="stab">88%</span></div>
+            <div class="row"><span class="osw mlbl">VIBRATO</span><span class="mono" id="vib" style="font-size:11px;color:var(--cream)">5.4 Hz ±14¢</span></div>
+            <div class="row"><span class="osw mlbl">NOISE FLOOR</span><span class="mono" id="noise" style="font-size:11px;color:var(--cream)">-61 dB</span></div>
+          </div>
+        </div>
+
+        <!-- center -->
+        <div class="card" style="background:var(--screen)">
+          <div class="row" style="gap:10px">
+            <div class="title" id="centerTitle" style="font-size:13px"></div>
+            <div style="flex:1"></div>
+            <button class="btn rec on" id="rec"><span class="dot"></span><span id="recLbl">RECORDING</span></button>
+            <button class="btn">CLEAR</button>
+            <button class="btn">&#8681; EXPORT .MID</button>
+            <button class="btn" style="border:1px dashed var(--amber);color:var(--amber)">&#9638; DRAG TO DAW</button>
+          </div>
+          <div id="center" style="flex:1;min-height:0;display:flex"></div>
+        </div>
+
+        <!-- key -->
+        <div class="card" style="padding:14px 16px">
+          <div class="between"><div class="title" style="font-size:13px">KEY &amp; SCALE</div>
+            <div class="row" style="gap:4px"><button class="pill amber on" id="kAuto" style="padding:0 8px">AUTO</button><button class="pill amber" id="kLock" style="padding:0 8px">LOCK</button></div></div>
+          <div class="row" style="align-items:baseline;gap:10px">
+            <div class="mono glow-a" style="font-size:34px">A MINOR</div><div class="mono" style="font-size:13px">87%</div></div>
+          <div class="mono" style="font-size:11px;color:var(--muted)">ALT: C MAJOR 81% · E PHRYGIAN 64%</div>
+          <div id="hist" style="flex:1;display:flex;align-items:flex-end;gap:4px;padding-top:6px"></div>
+          <div class="between" style="padding-top:6px;border-top:1px solid var(--line)">
+            <span class="osw" style="font-size:11px">SCALE SNAP</span>
+            <button class="switch on" id="snap" aria-label="Scale snap"><span></span></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROW 2 -->
+      <div id="perf" style="height:150px;display:grid;grid-template-columns:1fr 1.25fr 1.35fr 1fr;gap:14px"></div>
+
+      <!-- ROW 3 -->
+      <div style="flex:1;display:flex;flex-direction:column;gap:8px">
+        <div class="row" style="gap:12px">
+          <div class="osw" style="font-size:11px;letter-spacing:.3em;color:var(--muted)">SOUND ENGINE</div>
+          <div style="flex:1;height:1px;background:var(--line)"></div>
+          <span class="osw" style="font-size:10px;color:var(--muted)">FX APPLY TO</span>
+          <div class="seg" id="targets" style="padding:3px"></div>
+        </div>
+        <div id="engine" style="flex:1;display:grid;grid-template-columns:1.45fr 1.2fr .62fr 1.35fr 1.05fr;gap:14px"></div>
+      </div>
+    </div>
+  </div>
+  <div class="wood"></div>
+</div>
+<div class="hint">Drag knobs up/down or scroll on them · click modes, waveforms and buttons</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const C = { cyan: '#3ee8ff', amber: '#ffb340' };
+const NAMES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const state = { mode: 'melody', rec: true, target: 'both', waves: [2, 3, 0] };
+
+// ---------- knobs ----------
+function knobSVG(v, color, size) {
+  const dash = (v * 89.5).toFixed(1), ang = (-135 + v * 270).toFixed(1);
+  return `<svg width="${size}" height="${size}" viewBox="0 0 48 48">
+    <circle cx="24" cy="24" r="19" fill="none" stroke="#0a0a0c" stroke-width="4" stroke-dasharray="89.5 200" transform="rotate(135 24 24)"/>
+    <circle cx="24" cy="24" r="19" fill="none" stroke="${color}" stroke-width="4" stroke-linecap="round" stroke-dasharray="${dash} 200" transform="rotate(135 24 24)" style="filter:drop-shadow(0 0 3px ${color})"/>
+    <circle cx="24" cy="24" r="13" fill="#2a262d" stroke="#3a353e"/>
+    <line x1="24" y1="24" x2="24" y2="13" stroke="#e9dfc8" stroke-width="2" stroke-linecap="round" transform="rotate(${ang} 24 24)"/></svg>`;
+}
+// k = [label, value 0..1, formatter(v) -> string, color]
+function knob(k, size = 48) {
+  const el = document.createElement('div');
+  el.className = 'knob';
+  let [label, v, fmt, color] = k;
+  color = color || C.cyan;
+  const draw = () => { el.innerHTML = knobSVG(v, color, size) + `<div class="val">${fmt(v)}</div><div class="lbl">${label}</div>`; };
+  draw();
+  const set = nv => { v = Math.min(1, Math.max(0, nv)); draw(); };
+  el.addEventListener('wheel', e => { e.preventDefault(); set(v - e.deltaY * 0.0012); }, { passive: false });
+  el.addEventListener('pointerdown', e => {
+    const y0 = e.clientY, v0 = v; el.setPointerCapture(e.pointerId);
+    const move = ev => set(v0 + (y0 - ev.clientY) / 150);
+    const up = () => { el.removeEventListener('pointermove', move); el.removeEventListener('pointerup', up); };
+    el.addEventListener('pointermove', move); el.addEventListener('pointerup', up);
+  });
+  el.addEventListener('dblclick', () => set(k[1]));
+  return el;
+}
+// formatters
+const pct = v => Math.round(v * 100) + '%';
+const range = (a, b, unit = '', d = 0) => v => (a + (b - a) * v).toFixed(d) + unit;
+const signed = (a, b, unit = '') => v => { const x = Math.round(a + (b - a) * v); return (x > 0 ? '+' : '') + x + unit; };
+const pick = list => v => list[Math.min(list.length - 1, Math.floor(v * list.length))];
+const freq = (lo, hi) => v => { const f = lo * Math.pow(hi / lo, v); return f >= 1000 ? (f / 1000).toFixed(1) + 'k' : Math.round(f) + ''; };
+const ms = (lo, hi) => v => { const t = lo * Math.pow(hi / lo, v); return t >= 1000 ? (t / 1000).toFixed(1) + 's' : Math.round(t) + 'ms'; };
+
+// ---------- header ----------
+function renderModes() {
+  $('modes').innerHTML = '';
+  [['melody','MELODY'],['drums','DRUMS'],['chords','CHORDS']].forEach(([id, l]) => {
+    const b = document.createElement('button');
+    b.className = 'pill' + (state.mode === id ? ' on' : ''); b.textContent = l;
+    b.style.cssText = 'height:32px;padding:0 16px';
+    b.onclick = () => { state.mode = id; renderModes(); renderCenter(); };
+    $('modes').appendChild(b);
+  });
+}
+for (let i = 0; i < 16; i++) { const d = document.createElement('div'); d.style.cssText = 'width:7px;height:14px;border-radius:1px;background:#2a262d'; $('leds').appendChild(d); }
+
+// ---------- meter ----------
+// Vintage needle meter: pivot below the face, ±50 cents = ±47.5°.
+const PX = 196, PY = 206, R = 172, DEG = 0.95;
+const polar = (cents, r) => { const a = (cents * DEG - 90) * Math.PI / 180; return [PX + r * Math.cos(a), PY + r * Math.sin(a)]; };
+const arc = (c0, c1, r) => { const [x0, y0] = polar(c0, r), [x1, y1] = polar(c1, r); return `M ${x0.toFixed(1)} ${y0.toFixed(1)} A ${r} ${r} 0 0 1 ${x1.toFixed(1)} ${y1.toFixed(1)}`; };
+const meterFace = (() => {
+  let s = `<path d="${arc(-50, 50, R)}" fill="none" stroke="#2a2420" stroke-width="1.2"/>
+    <path d="${arc(-50, -30, R - 6)}" fill="none" stroke="#c2410c" stroke-width="6" opacity=".85"/>
+    <path d="${arc(30, 50, R - 6)}" fill="none" stroke="#c2410c" stroke-width="6" opacity=".85"/>
+    <path d="${arc(-5, 5, R - 6)}" fill="none" stroke="#0e7490" stroke-width="6"/>`;
+  for (let c = -50; c <= 50; c += 2.5) {
+    const major = c % 25 === 0, mid = c % 5 === 0;
+    const [x0, y0] = polar(c, R), [x1, y1] = polar(c, R - (major ? 18 : mid ? 12 : 7));
+    s += `<line x1="${x0.toFixed(1)}" y1="${y0.toFixed(1)}" x2="${x1.toFixed(1)}" y2="${y1.toFixed(1)}" stroke="#2a2420" stroke-width="${major ? 2 : mid ? 1.2 : .7}"/>`;
+    if (major) { const [tx, ty] = polar(c, R - 30); s += `<text x="${tx.toFixed(1)}" y="${(ty + 4).toFixed(1)}" text-anchor="middle" font-family="Share Tech Mono" font-size="11" fill="#2a2420">${c > 0 ? '+' + c : c}</text>`; }
+  }
+  s += `<text x="34" y="112" font-family="Oswald" font-size="16" fill="#5a4f44">♭</text>
+    <text x="350" y="112" font-family="Oswald" font-size="15" fill="#5a4f44">♯</text>
+    <text x="196" y="88" text-anchor="middle" font-family="Oswald" font-size="9" letter-spacing="3" fill="#5a4f44">CENTS</text>
+    <text x="196" y="100" text-anchor="middle" font-family="Oswald" font-size="8" letter-spacing="2" fill="#8a7a62">QIMIST · MODEL VT-1</text>`;
+  return s;
+})();
+function renderMeter(cents) {
+  const c = Math.max(-55, Math.min(55, cents));
+  const [nx, ny] = polar(c, R - 2), [sx, sy] = polar(c + 1.2, R - 2);
+  $('meter').innerHTML = meterFace +
+    `<line x1="${PX + 2}" y1="${PY + 3}" x2="${(sx + 2).toFixed(1)}" y2="${(sy + 3).toFixed(1)}" stroke="rgba(60,40,10,.25)" stroke-width="2.5"/>
+     <line x1="${PX}" y1="${PY}" x2="${nx.toFixed(1)}" y2="${ny.toFixed(1)}" stroke="#b91c1c" stroke-width="2" stroke-linecap="round"/>
+     <circle cx="${PX}" cy="124" r="22" fill="#1d1a20"/><circle cx="${PX}" cy="124" r="15" fill="#2a262d" stroke="#3a353e"/>`;
+}
+
+// ---------- center ----------
+const MEL = [[69,0,2],[72,2,1],[71,3,1],[69,4,2],[67,6,1],[64,7,2],[65,9,1],[67,10,1],[69,11,1.5]];
+function renderCenter() {
+  const titles = { melody: 'CAPTURED NOTES · PIANO ROLL', drums: 'BEATBOX → DRUM KIT', chords: 'CHORD GENERATOR' };
+  $('centerTitle').textContent = titles[state.mode];
+  const c = $('center');
+  if (state.mode === 'melody') {
+    let keys = '', lanes = '';
+    for (let m = 72; m >= 60; m--) {
+      const black = NAMES[m % 12].length > 1;
+      keys += `<div class="mono" style="height:17px;padding-left:5px;font-size:9px;line-height:17px;color:var(--muted);background:${black ? '#0f0e11' : '#1d1a20'}">${NAMES[m % 12]}${Math.floor(m / 12) - 1}</div>`;
+      lanes += `<div style="height:17px;border-bottom:1px solid #17151a;background:${black ? '#0d0c0f' : '#121014'}"></div>`;
+    }
+    let bars = '';
+    for (let b = 0; b < 16; b++) bars += `<div style="position:absolute;top:0;bottom:0;left:${b / 16 * 100}%;width:1px;background:${b % 4 ? '#18161b' : '#2c2830'}"></div>`;
+    const notes = MEL.map(n => `<div style="position:absolute;top:${(72 - n[0]) * 17 + 2}px;left:${n[1] / 16 * 100 + .3}%;width:${n[2] / 16 * 100 - .6}%;height:13px;border-radius:3px;background:var(--cyan);box-shadow:0 0 10px rgba(62,232,255,.5)"></div>`).join('');
+    c.innerHTML = `<div style="flex:1;display:flex;border:1px solid #221f25;border-radius:6px;overflow:hidden">
+      <div style="width:38px;border-right:1px solid #221f25">${keys}</div>
+      <div style="flex:1;position:relative">${lanes}${bars}${notes}
+        <div id="playhead" style="position:absolute;top:0;bottom:0;left:0;width:2px;background:var(--amber);box-shadow:0 0 8px var(--amber)"></div></div></div>`;
+  } else if (state.mode === 'drums') {
+    const pads = [['KICK','"BOOM" · NOTE 36 · 98% ACC',C.amber],['SNARE','"PFF / KA" · NOTE 38 · 93% ACC','#e9dfc8'],['HI-HAT','"TSS" · NOTE 42 · 96% ACC',C.cyan]];
+    const pat = { KICK: [0,6,8,11], SNARE: [4,12], 'HI-HAT': [0,2,4,6,8,10,12,13,14] };
+    const padHTML = pads.map(([n, info, col]) => `<div style="flex:1;display:flex;align-items:center;gap:10px;padding:0 10px;border-radius:6px;background:var(--panel2);border:1px solid var(--line)">
+      <div class="pad" data-col="${col}" style="width:40px;height:40px;border-radius:6px;background:#2a262d"></div>
+      <div style="flex:1"><div class="osw" style="font-size:13px">${n}</div><div class="mono" style="font-size:10px;color:var(--muted)">${info}</div></div>
+      <button class="btn" style="height:28px;border-color:var(--amber);color:var(--amber);background:transparent">TRAIN</button></div>`).join('');
+    const grid = pads.map(([n, , col]) => {
+      let s = '';
+      for (let k = 0; k < 16; k++) { const on = pat[n].includes(k); s += `<div style="flex:1;height:34px;border-radius:3px;background:${on ? col : (k % 4 ? '#151317' : '#1d1a20')};box-shadow:${on ? '0 0 8px ' + col : 'none'}"></div>`; }
+      return `<div class="row" style="gap:4px"><div class="osw" style="width:50px;font-size:10px;color:var(--muted)">${n}</div>${s}</div>`;
+    }).join('');
+    c.innerHTML = `<div style="flex:1;display:flex;gap:12px"><div style="width:270px;display:flex;flex-direction:column;gap:8px">${padHTML}</div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:6px;justify-content:center;border:1px solid #221f25;border-radius:6px;padding:10px">${grid}</div></div>`;
+  } else {
+    const prog = [['Am7','i7'],['Fmaj7','VI'],['C','III'],['G','VII'],['Am7','i7'],['Dm7','iv7'],['Em','v'],['—','']];
+    c.innerHTML = `<div style="flex:1;display:flex;flex-direction:column;gap:12px">
+      <div class="row" style="gap:20px;padding:6px 4px"><div class="mono glow-c" style="font-size:64px;line-height:1">Am7</div>
+        <div class="mono" style="font-size:13px"><div>SUNG A4 → A3 · C4 · E4 · G4</div><div style="color:var(--muted)">DEGREE i7 IN A MINOR · SPREAD 2 OCT</div></div></div>
+      <div style="flex:1;display:grid;grid-template-columns:repeat(8,1fr);gap:6px">${prog.map((p, i) => `<div style="border-radius:6px;border:1px solid ${i === 4 ? C.cyan : '#2c2830'};background:var(--panel2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px">
+        <div class="mono" style="font-size:20px;color:${i === 4 ? C.cyan : '#e9dfc8'}">${p[0]}</div><div class="osw" style="font-size:10px;color:var(--muted)">${p[1]}</div></div>`).join('')}</div></div>`;
+  }
+}
+
+// ---------- key histogram ----------
+(() => {
+  const v = [.62,.05,.41,.04,.7,.33,.06,.48,.08,1,.03,.39], inS = [1,0,1,0,1,1,0,1,0,1,0,1];
+  $('hist').innerHTML = NAMES.map((n, i) => `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+    <div style="width:100%;height:${8 + v[i] * 92}px;border-radius:2px;background:${inS[i] ? (i === 9 ? C.amber : 'rgba(255,179,64,.55)') : '#2a262d'}"></div>
+    <div class="mono" style="font-size:9px;color:${inS[i] ? '#e9dfc8' : '#6b6358'}">${n}</div></div>`).join('');
+})();
+
+// ---------- sections ----------
+function section(parent, title, tag, tagColor, knobs, opts = {}) {
+  const card = document.createElement('div'); card.className = 'card';
+  card.innerHTML = `<div class="between"><div class="title">${title}</div>${tag ? `<div class="mono" style="font-size:10px;color:${tagColor}">${tag}</div>` : '<div style="width:8px;height:8px;border-radius:50%;background:var(--amber);box-shadow:0 0 6px var(--amber)"></div>'}</div>`;
+  if (opts.eq) card.insertAdjacentHTML('beforeend', `<svg width="100%" height="58" viewBox="0 0 260 58" preserveAspectRatio="none" style="background:#0a0a0c;border-radius:5px">
+    <line x1="0" y1="29" x2="260" y2="29" stroke="#2c2830"/>
+    <path d="M0 38 C 30 38, 40 22, 60 22 S 90 30, 110 31 S 140 40, 150 40 S 175 28, 195 20 S 230 16, 260 14" fill="none" stroke="#3ee8ff" stroke-width="2"/>
+    <circle cx="60" cy="22" r="3.5" fill="#ffb340"/><circle cx="150" cy="40" r="3.5" fill="#ffb340"/><circle cx="200" cy="19" r="3.5" fill="#ffb340"/></svg>`);
+  const wrap = document.createElement('div');
+  wrap.style.cssText = opts.cols ? `display:grid;grid-template-columns:repeat(${opts.cols},1fr);gap:2px 4px;flex:1;align-content:center;justify-items:center`
+                                  : 'display:flex;justify-content:space-between;gap:4px';
+  knobs.forEach(k => wrap.appendChild(knob(k, opts.size || 48)));
+  card.appendChild(wrap); parent.appendChild(card);
+}
+
+section($('perf'), 'INPUT', 'LAPTOP MIC PROFILE', C.cyan, [
+  ['GATE', .45, signed(-80, -20, 'dB')], ['SENS', .72, pct], ['DENOISE', .6, pct], ['MIN NOTE', .3, ms(15, 200)]]);
+section($('perf'), 'NOTE OUT', 'QUANTIZE', C.amber, [
+  ['OCTAVE', .5, signed(-2, 2)], ['TRANS', .5, signed(-12, 12, ' st')], ['QUANT', .75, pick(['OFF','1/4','1/8','1/16','1/32']), C.amber],
+  ['GLIDE', .3, pct], ['VEL CURVE', .55, pick(['FIXED','LINEAR','SOFT','HARD'])]]);
+section($('perf'), 'HARMONY + ARP', 'CHORDS · ARP', C.amber, [
+  ['CHORD', .33, pick(['OFF','TRIAD','7TH','POWER','SUS']), C.amber], ['SPREAD', .5, range(0, 4, ' OCT')],
+  ['ARP RATE', .6, pick(['OFF','1/4','1/8','1/16','1/32']), C.amber], ['ARP GATE', .7, pct], ['PATTERN', .1, pick(['UP','DOWN','UP/DN','RANDOM'])]]);
+section($('perf'), 'VOICE', 'AUTO-TUNE', C.cyan, [
+  ['TUNE AMT', .8, pct], ['SPEED', .25, ms(1, 200)], ['VOX MIX', .35, pct, C.amber]]);
+
+// oscillators
+(() => {
+  const WAVES = [['Sine','M1 6 C 4 -1, 7 -1, 10 6 S 16 13, 19 6'],['Triangle','M1 10 L 5.5 2 L 10 10 L 14.5 2 L 19 10'],
+    ['Saw','M1 10 L 10 2 L 10 10 L 19 2 L 19 10'],['Square','M1 10 L 1 2 L 10 2 L 10 10 L 19 10 L 19 2'],
+    ['Noise','M1 6 L 3 2 L 5 9 L 7 4 L 9 10 L 11 3 L 13 8 L 15 2 L 17 9 L 19 5']];
+  const meta = [['1','+0 OCT','+0 ct',85],['2','-1 OCT','+7 ct',60],['3','+1 OCT','-5 ct',30]];
+  const card = document.createElement('div'); card.className = 'card'; card.style.gap = '8px';
+  card.innerHTML = '<div class="title">OSCILLATORS</div>';
+  meta.forEach(([n, oct, det, lvl], oi) => {
+    const row = document.createElement('div'); row.className = 'row'; row.style.flex = '1';
+    const draw = () => {
+      row.innerHTML = `<div class="mono" style="font-size:11px;color:var(--cyan);width:14px">${n}</div><div class="row" style="gap:3px">${
+        WAVES.map((w, wi) => `<button class="wave${state.waves[oi] === wi ? ' on' : ''}" data-w="${wi}" aria-label="Osc ${n} ${w[0]}"><svg width="20" height="12" viewBox="0 0 20 12" fill="none" stroke="currentColor" stroke-width="1.6"><path d="${w[1]}"/></svg></button>`).join('')
+      }</div><div style="flex:1"></div><div class="mono" style="font-size:10px;color:var(--muted);text-align:right"><div style="color:var(--cream)">${oct}</div>${det}</div>
+      <div style="width:54px;height:6px;border-radius:3px;background:var(--screen);overflow:hidden"><div style="height:6px;width:${lvl}%;background:var(--cyan)"></div></div>`;
+      row.querySelectorAll('.wave').forEach(b => b.onclick = () => { state.waves[oi] = +b.dataset.w; draw(); });
+    };
+    draw(); card.appendChild(row);
+  });
+  $('engine').appendChild(card);
+})();
+
+section($('engine'), 'FILTER + ENV', '', '', [
+  ['CUTOFF', .62, freq(20, 20000)], ['RESO', .35, pct], ['ENV AMT', .5, pct, C.amber],
+  ['ATTACK', .1, ms(1, 5000), C.amber], ['DECAY', .4, ms(1, 5000), C.amber], ['RELEASE', .45, ms(1, 5000), C.amber]], { cols: 3, size: 40 });
+section($('engine'), 'CHORUS', '', '', [
+  ['RATE', .3, range(0.05, 5, 'Hz', 1)], ['DEPTH', .55, pct], ['MIX', .4, pct, C.amber]], { cols: 1, size: 40 });
+section($('engine'), 'EQ · 5 BAND', '', '', [
+  ['LOW', .62, signed(-12, 12, 'dB')], ['250', .5, signed(-12, 12, 'dB')], ['1K', .35, signed(-12, 12, 'dB')],
+  ['4K', .6, signed(-12, 12, 'dB')], ['HIGH', .68, signed(-12, 12, 'dB')]], { cols: 5, size: 40, eq: true });
+section($('engine'), 'REVERB', '', '', [
+  ['SIZE', .7, pct], ['DECAY', .55, range(0.1, 10, 's', 1)], ['DAMP', .4, pct],
+  ['PRE-DLY', .2, v => Math.round(v * 100) + 'ms'], ['WIDTH', .9, pct], ['MIX', .3, pct, C.amber]], { cols: 3, size: 40 });
+
+// targets
+function renderTargets() {
+  $('targets').innerHTML = '';
+  [['synth','SYNTH'],['voice','VOICE'],['both','BOTH']].forEach(([id, l]) => {
+    const b = document.createElement('button'); b.className = 'pill amber' + (state.target === id ? ' on' : '');
+    b.style.height = '24px'; b.textContent = l; b.onclick = () => { state.target = id; renderTargets(); };
+    $('targets').appendChild(b);
+  });
+}
+
+// toggles
+$('rec').onclick = () => { state.rec = !state.rec; $('rec').classList.toggle('on', state.rec); $('recLbl').textContent = state.rec ? 'RECORDING' : 'RECORD'; };
+$('snap').onclick = () => $('snap').classList.toggle('on');
+$('kAuto').onclick = () => { $('kAuto').classList.add('on'); $('kLock').classList.remove('on'); };
+$('kLock').onclick = () => { $('kLock').classList.add('on'); $('kAuto').classList.remove('on'); };
+
+renderModes(); renderCenter(); renderTargets(); renderMeter(6);
+
+// one-octave keyboard
+const kbdKeys = [];
+(() => {
+  const k = $('kbd'), whites = [0, 2, 4, 5, 7, 9, 11], blacks = [[1, 0], [3, 1], [6, 3], [8, 4], [10, 5]];
+  whites.forEach(pc => { const d = document.createElement('div'); d.className = 'w'; d.innerHTML = `<span>${NAMES[pc]}</span>`; k.appendChild(d); kbdKeys[pc] = d; });
+  blacks.forEach(([pc, after]) => { const d = document.createElement('div'); d.className = 'b'; d.style.left = `calc(${(after + 1) / 7 * 100}% - 2.6%)`; k.appendChild(d); kbdKeys[pc] = d; });
+})();
+
+// ---------- live simulation (fake singing) ----------
+const SONG = [69, 72, 71, 69, 67, 64, 65, 67, 69, 69];
+const hist = [];   // pitch history (float midi or null when unvoiced)
+let t = 0, pitch = 69, lastNote = -1;
+setInterval(() => {
+  t += 0.05;
+  const step = Math.floor(t / 0.8), phase = (t % 0.8) / 0.8;
+  const target = SONG[step % SONG.length];
+  const voiced = phase > 0.1;   // short breath gap between notes
+  pitch += (target - pitch) * 0.35;
+  const vib = Math.sin(t * 2 * Math.PI * 5.4) * 0.14 * Math.min(1, phase * 2);
+  const p = pitch + vib + (Math.random() - .5) * 0.03 + 0.05;
+  hist.push(voiced ? p : null); if (hist.length > 60) hist.shift();
+
+  const note = Math.round(p), cents = Math.round((p - note) * 100);
+  const conf = voiced ? Math.round(91 + Math.sin(t * 1.7) * 5) : 12;
+  const stab = voiced ? Math.round(70 + phase * 25) : 0;
+  $('voicedLed').classList.toggle('on', voiced);
+  $('voicedLbl').textContent = voiced ? 'VOICED' : 'SILENT';
+  $('lockBadge').classList.toggle('on', voiced && conf > 85);
+  $('lockBadge').textContent = voiced ? (conf > 85 ? 'LOCKED' : 'SEARCH') : 'IDLE';
+
+  if (voiced) {
+    renderMeter(cents);
+    const nm = NAMES[note % 12];
+    $('noteName').textContent = nm[0]; $('noteAcc').textContent = nm[1] || '';
+    $('noteOct').textContent = Math.floor(note / 12) - 1;
+    $('hz').textContent = (440 * Math.pow(2, (p - 69) / 12)).toFixed(1);
+    $('cents').textContent = (cents >= 0 ? '+' : '') + cents + '¢';
+    $('midiNum').textContent = note;
+    if (note !== lastNote) { $('vel').textContent = 80 + Math.floor(Math.random() * 30); lastNote = note; }
+    kbdKeys.forEach((k, pc) => k.classList.toggle('on', pc === note % 12));
+    $('tuneLamp').classList.toggle('on', Math.abs(cents) <= 5);
+  } else {
+    kbdKeys.forEach(k => k.classList.remove('on'));
+    $('tuneLamp').classList.remove('on');
+  }
+  $('conf').textContent = conf + '%'; $('confBar').style.width = conf + '%';
+  $('stab').textContent = stab + '%'; $('stabBar').style.width = stab + '%';
+  $('vib').textContent = voiced ? `5.4 Hz ±${Math.round(14 * Math.min(1, phase * 2))}¢` : '—';
+  $('noise').textContent = Math.round(-62 + Math.random() * 2) + ' dB';
+
+  // pitch trace: ±2.5 semitones around the current note
+  const center = voiced ? note : (lastNote > 0 ? lastNote : 69), span = 2.5, H = 82, W = 240;
+  const y = m => H / 2 - (m - center) / span * (H / 2);
+  let svg = '';
+  for (let d = -2; d <= 2; d++) svg += `<line x1="0" x2="${W}" y1="${y(center + d)}" y2="${y(center + d)}" stroke="${d === 0 ? '#2c4a52' : '#1d1a20'}" stroke-width="1"/>`;
+  let seg = [];
+  const flush = () => { if (seg.length > 1) svg += `<polyline points="${seg.join(' ')}" fill="none" stroke="#3ee8ff" stroke-width="1.8" stroke-linejoin="round" style="filter:drop-shadow(0 0 3px #3ee8ff)"/>`; seg = []; };
+  hist.forEach((m, i) => { if (m == null) return flush(); seg.push(`${(i / 59 * W).toFixed(1)},${y(m).toFixed(1)}`); });
+  flush();
+  $('trace').innerHTML = svg;
+  $('traceLbls').innerHTML = [-2, -1, 0, 1, 2].map(d => { const m = center + d; return `<div style="position:absolute;right:0;top:${y(m) / H * 100 - 6}%;color:${d === 0 ? '#3ee8ff' : ''}">${NAMES[((m % 12) + 12) % 12]}${Math.floor(m / 12) - 1}</div>`; }).join('');
+
+  const lvl = voiced ? Math.round(9 + Math.sin(t * 5) * 3 + Math.random() * 2) : 2;
+  [...$('leds').children].forEach((d, i) => d.style.background = i < lvl ? (i < 10 ? C.cyan : (i < 13 ? C.amber : '#ff5a4f')) : '#2a262d');
+  const ph = $('playhead'); if (ph) ph.style.left = ((t * 8) % 100) + '%';
+  document.querySelectorAll('.pad').forEach((p, i) => {
+    const on = Math.sin(t * (3 + i * 2.1)) > .85;
+    p.style.background = on ? p.dataset.col : '#2a262d'; p.style.boxShadow = on ? '0 0 14px ' + p.dataset.col : 'none';
+  });
+}, 50);
+</script>
+</body>
+</html>

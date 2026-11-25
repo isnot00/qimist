@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Qimist Manual</title>
+<style>
+  :root {
+    --bg: #0c0b0e; --panel: #16141a; --line: #2a262f; --cream: #f1e6d2; --muted: #a59d92;
+    --cyan: #3ee8ff; --amber: #ffb340; --red: #ff5a5a;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--cream); font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 32px 16px 80px; }
+  header { border-bottom: 1px solid var(--line); padding-bottom: 20px; margin-bottom: 8px; }
+  .logo { font-size: 40px; letter-spacing: .04em; margin: 0; font-weight: 500; }
+  .logo b { color: var(--cyan); font-weight: 500; }
+  .tag { color: var(--muted); letter-spacing: .2em; font-size: 12px; text-transform: uppercase; }
+  nav { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 18px 0 0; font-size: 14px; }
+  nav a { color: var(--muted); text-decoration: none; }
+  nav a:hover { color: var(--cyan); }
+  h2 { color: var(--amber); font-size: 15px; letter-spacing: .14em; text-transform: uppercase; margin: 44px 0 10px; font-family: ui-monospace, Menlo, Consolas, monospace; }
+  h3 { font-size: 17px; margin: 22px 0 6px; color: var(--cream); }
+  p, li { color: #e4d9c6; }
+  a { color: var(--cyan); }
+  code, kbd { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 14px; background: var(--panel); border: 1px solid var(--line); border-radius: 5px; padding: 1px 6px; color: var(--cyan); }
+  kbd { color: var(--cream); }
+  .ui { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13px; color: var(--cyan); letter-spacing: .05em; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 18px; margin: 14px 0; }
+  .tip { border-left: 3px solid var(--amber); }
+  .warn { border-left: 3px solid var(--red); }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; margin: 10px 0; }
+  td, th { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 500; font-size: 13px; text-transform: uppercase; letter-spacing: .08em; }
+  .os { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+  .os .card { margin: 0; }
+  .os h3 { margin-top: 0; }
+  footer { margin-top: 60px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); padding-top: 16px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <p class="logo"><b>QI</b>MIST</p>
+  <div class="tag">Voice · to · MIDI · Synth — Manual</div>
+  <nav>
+    <a href="#install">Install</a><a href="#start">First steps</a><a href="#modes">Modes</a>
+    <a href="#record">Record &amp; edit</a><a href="#looper">Looper</a><a href="#song">Song mode</a><a href="#chords">Chords</a>
+    <a href="#autotune">Auto-tune</a><a href="#sound">Sound</a><a href="#presets">Presets</a>
+    <a href="#mic">Mic tips</a><a href="#keys">Shortcuts</a><a href="#trouble">Troubleshooting</a>
+  </nav>
+</header>
+
+<p>Qimist listens to your voice and turns it into music. Sing, hum or whistle a tune and it plays it on a synth and sends it out as MIDI notes. Beatbox and it plays drums. Sing a melody and it plays chords that fit. Everything you do can be recorded, edited and exported as a <code>.mid</code> file for your DAW.</p>
+<p>Qimist comes as a <b>standalone app</b> (no DAW needed) and as <b>VST3</b> and <b>CLAP</b> plugins.</p>
+
+<h2 id="install">Install</h2>
+<div class="os">
+  <div class="card">
+    <h3>Windows</h3>
+    <p>Run <code>Qimist-…-windows-setup.exe</code> and click through. It installs the app (Start menu + desktop), the VST3 and the CLAP plugin.</p>
+    <p>From the zip instead: copy <code>Qimist.vst3</code> to <code>C:\Program Files\Common Files\VST3</code> and <code>Qimist.clap</code> to <code>C:\Program Files\Common Files\CLAP</code>. <code>Qimist.exe</code> runs from anywhere.</p>
+  </div>
+  <div class="card">
+    <h3>macOS</h3>
+    <p>Open <code>Qimist-…-macos.pkg</code>. It installs <b>Qimist.app</b> into Applications and the plugins into <code>/Library/Audio/Plug-Ins</code>.</p>
+    <p>The first time, right-click Qimist.app → <b>Open</b> (it isn't signed by Apple), and allow microphone access when asked.</p>
+  </div>
+  <div class="card">
+    <h3>Linux</h3>
+    <p>Unpack the <code>.tar.gz</code> and run <code>./install.sh</code>. It installs the plugins into <code>~/.vst3</code> and <code>~/.clap</code>, and adds Qimist to your app menu (or run <code>qimist</code>).</p>
+    <p>The app uses PipeWire's JACK support (<code>pw-jack</code>). Remove with <code>./install.sh --uninstall</code>.</p>
+  </div>
+</div>
+<div class="card tip">In a DAW, put Qimist on an <b>audio track</b> with your mic as input. To record its notes, route its MIDI output to an instrument track (each DAW does this a little differently; look for "MIDI from" or "MIDI output" routing). Qimist also has its own synth, so you'll hear something right away.</div>
+
+<h2 id="start">First steps</h2>
+<ol>
+  <li>Start Qimist. A short tour opens the first time; the <span class="ui">?</span> button at the top left opens it again.</li>
+  <li>Sing a note. The big meter on the left shows the note and how in tune you are, and <span class="ui">YOU</span> lights up in the INPUT panel.</li>
+  <li>Press <span class="ui">CALIBRATE</span> (DETECTION panel): stay quiet for a moment, then sing your lowest and highest comfortable notes. Qimist sets the noise gate and your voice range.</li>
+  <li>Pick a <a href="#modes">mode</a>, press <span class="ui">RECORD</span> and make some music.</li>
+</ol>
+
+<h2 id="modes">Modes</h2>
+<table>
+  <tr><th>Mode</th><th>What it does</th></tr>
+  <tr><td class="ui">MELODY</td><td>Your voice plays notes. The synth follows your pitch; MIDI notes go out to your DAW.</td></tr>
+  <tr><td class="ui">DRUMS</td><td>Beatbox: "boom" for kick, "psh"/"ka" for snare, "ts" for hi-hat. The KIT screen lets you <b>train</b> Qimist on your own sounds (record a few of each), choose a kit or load your own samples, and set the MIDI note of each pad.</td></tr>
+  <tr><td class="ui">CHORDS</td><td>Sing a tune and Qimist plays chords from the key that fit it. The PADS screen shows the seven chords of the key; click and hold one to play it yourself.</td></tr>
+</table>
+
+<h3>Key &amp; scale</h3>
+<p>Qimist works out which key you're singing in (top right). When you know the key, click <span class="ui">LOCK</span> and pick it. <span class="ui">SCALE SNAP</span> moves every note into that key, so wrong notes become right ones.</p>
+
+<h2 id="record">Record &amp; edit</h2>
+<p>In MELODY mode, press <span class="ui">RECORD</span>, sing, then <span class="ui">STOP REC</span>. Your notes appear in the piano roll, ready to edit:</p>
+<table>
+  <tr><th>To…</th><th>Do this</th></tr>
+  <tr><td>Select a note</td><td>Click it. <kbd>Shift</kbd>-click adds more; drag on empty space to box-select.</td></tr>
+  <tr><td>Move notes</td><td>Drag them. Sideways snaps to the grid, up/down changes the pitch.</td></tr>
+  <tr><td>Change length</td><td>Drag the right edge of a note.</td></tr>
+  <tr><td>Add a note</td><td>Double-click empty space.</td></tr>
+  <tr><td>Delete</td><td><kbd>Delete</kbd> or <kbd>Backspace</kbd>.</td></tr>
+  <tr><td>Transpose</td><td><kbd>↑</kbd> <kbd>↓</kbd> one semitone, with <kbd>Shift</kbd> one octave.</td></tr>
+  <tr><td>Nudge in time</td><td><kbd>←</kbd> <kbd>→</kbd> one grid step.</td></tr>
+  <tr><td>Snap to the grid</td><td><kbd>Q</kbd> (the selection, or everything if nothing is selected).</td></tr>
+  <tr><td>Undo / redo</td><td><kbd>Ctrl</kbd>+<kbd>Z</kbd> / <kbd>Ctrl</kbd>+<kbd>Y</kbd> (<kbd>Cmd</kbd> on a Mac).</td></tr>
+</table>
+<p><span class="ui">EXPORT .MID</span> saves the take to the <code>Music/Qimist</code> folder in your home folder (<span class="ui">OPEN FOLDER</span> takes you there); drag the file into your DAW. The first note lands on beat 1, and <span class="ui">EXPORT Q</span> in the MIDI panel can snap the file to a grid.</p>
+<div class="card tip">The keyboard shortcuts work while the mouse is over the piano roll. Some DAWs keep keys for themselves; the loop editor's buttons always work.</div>
+
+<h2 id="looper">Looper</h2>
+<p>The <span class="ui">LOOPER</span> tab (centre screen) layers up to four loops, like a loop pedal for MIDI.</p>
+<ol>
+  <li>Choose the loop length in <span class="ui">BARS</span> (1, 2, 4 or 8) and the tempo (<span class="ui">BPM</span> in the app; in a DAW it follows the project tempo).</li>
+  <li>Press <span class="ui">REC</span> on layer 1. With <span class="ui">COUNT-IN</span> on you get one bar of clicks first. Sing, beatbox or play chords for one loop.</li>
+  <li>It keeps playing. Press REC on layer 2 to add the next part on top.</li>
+</ol>
+<p><span class="ui">M</span> mutes a layer, <span class="ui">CLR</span> clears it, <span class="ui">UNDO</span> takes back the last take. <span class="ui">SNAP</span> quantizes what you record to 1/8 or 1/16 notes. <b>Click a layer's lane to edit it</b> in the piano roll (same controls as above; edits play right away). <span class="ui">EXPORT .MID</span> saves all unmuted layers. In a DAW, loops are saved with the project.</p>
+
+<h2 id="song">Song mode</h2>
+<p>The looper has four <b>scenes</b>, <span class="ui">A B C D</span>. Each is its own loop with its own four layers and length: a verse in A, a chorus in B, a bridge in C.</p>
+<ul>
+  <li>Click a scene to go to it. While the loop plays, the switch waits for the end of the current pass so it stays in time; the scene blinks until then.</li>
+  <li><span class="ui">COPY A ▶</span> copies the scene into the next empty one, a quick way to make a variation.</li>
+  <li><span class="ui">SONG</span> opens the arrangement: <span class="ui">+</span> adds the scene picked above, click a step to play it ×2, ×4 or ×8, right-click a step to remove it.</li>
+  <li><span class="ui">▶ PLAY SONG</span> runs through the steps by itself and stops at the end, or starts over with <span class="ui">REPEAT</span>. Picking a scene by hand leaves the song.</li>
+  <li><span class="ui">EXPORT SONG</span> saves the whole arrangement as one <code>.mid</code> file.</li>
+</ul>
+
+<h2 id="chords">Chords</h2>
+<p>In CHORDS mode (or with <span class="ui">USE CHORDS</span> in other modes):</p>
+<ul>
+  <li><span class="ui">FOLLOW</span> — <b>MELODY</b> picks chords from the key that fit your tune; <b>ROOT</b> puts the note you sing at the bottom of the chord.</li>
+  <li><span class="ui">CHANGE</span> — change chords right away (<b>NOW</b>), or wait for the next <b>BEAT</b> or <b>BAR</b>.</li>
+  <li><span class="ui">STEADY</span> — how long a note must last before the chord changes, so passing notes don't make it jump.</li>
+  <li><span class="ui">LET RING</span> — keep the chord sounding when you stop singing.</li>
+  <li>Styles <span class="ui">POP · SOUL · JAZZ · DREAMY · FOLK · ROCK · OCTAVE</span> choose the kind of chord; <span class="ui">SMOOTH</span> keeps the chord notes close together as chords change.</li>
+</ul>
+
+<h2 id="autotune">Voice auto-tune</h2>
+<p>Corrects the pitch of your own voice live. Turn up <span class="ui">AMOUNT</span>, and to hear it turn up <span class="ui">MONITOR</span> in the INPUT panel (<b>use headphones</b>, or the speakers feed back into the mic). <span class="ui">SPEED</span> sets how fast notes snap (fast = robotic effect), <span class="ui">FORMANT</span> makes the voice deeper or smaller, <span class="ui">HARMONY</span> adds harmony voices, and <span class="ui">LOW LAT</span> keeps the delay around 10 ms.</p>
+
+<h2 id="sound">Sound</h2>
+<p><b>SYNTH</b>: three oscillators, filter with envelope, amp envelope, unison and drive, an LFO, and <span class="ui">DYNAMICS</span> (how much your loudness changes the sound). <b>EFFECTS</b>: chorus, delay, 5-band EQ and reverb. <span class="ui">FX TO</span> chooses whether the effects go on the synth, your voice, or both. Turn the synth off with the <span class="ui">SYNTH</span> switch to only send MIDI.</p>
+<p>Right-click a knob to type a value; double-click resets it.</p>
+
+<h2 id="presets">Presets</h2>
+<p>Browse with the arrows at the top or click the name for the list. <span class="ui">SAVE</span> stores your own; they live in the Qimist config folder (<code>%APPDATA%\Qimist</code>, <code>~/Library/Application Support/Qimist</code> or <code>~/.config/Qimist</code>). Presets change the sound and musical settings but leave your mic setup alone.</p>
+
+<h2 id="mic">Getting the best from your mic</h2>
+<ul>
+  <li><b>Headphones</b> are best: the mic hears only you. On laptop speakers keep <span class="ui">ECHO</span> on (INPUT panel); it removes Qimist's own sound from what the mic hears.</li>
+  <li>Sing 20–40 cm from the mic. Run <span class="ui">CALIBRATE</span> once in each new room.</li>
+  <li>If noise makes notes, raise <span class="ui">GATE</span>. If people talking nearby get picked up, raise <span class="ui">FOCUS</span>.</li>
+  <li><span class="ui">LATENCY</span>: <b>FAST</b> reacts quickest, <b>ACCURATE</b> is steadiest. <b>BALANCED</b> suits most voices.</li>
+  <li>Choose <span class="ui">VOICE RANGE</span> LOW, MID or HIGH to match your voice; it avoids octave mistakes.</li>
+</ul>
+
+<h2 id="keys">Shortcuts</h2>
+<table>
+  <tr><td>Piano roll</td><td>see <a href="#record">Record &amp; edit</a></td></tr>
+  <tr><td>Tour</td><td><kbd>→</kbd>/<kbd>Enter</kbd> next, <kbd>←</kbd> back, <kbd>Esc</kbd> close</td></tr>
+  <tr><td>Knobs</td><td>drag up/down, right-click to type, double-click to reset</td></tr>
+  <tr><td>Window size</td><td>the <span class="ui">UI %</span> button at the top cycles 75–150 %</td></tr>
+</table>
+
+<h2 id="trouble">Troubleshooting</h2>
+<h3>The plugin hears nothing in Ableton Live</h3>
+<p>Qimist is an <b>audio effect</b>: it hears whatever audio its track gets, and Ableton only feeds a track the mic when it's set up to. A red bar at the top of Qimist says when no sound is arriving.</p>
+<ol>
+  <li><b>Preferences → Audio</b>: pick your audio device and an <b>Input Device</b>. Under <b>Input Config</b>, switch on the mic's channels. On a Mac, also allow Ableton to use the microphone (System Settings → Privacy &amp; Security → Microphone).</li>
+  <li>Put Qimist on an <b>audio track</b>, not a MIDI track.</li>
+  <li>On that track set <b>Audio From</b> → <i>Ext. In</i> and your mic's channel (e.g. <i>1</i> or <i>1/2</i>).</li>
+  <li>Set <b>Monitor</b> → <b>In</b>. Without it Ableton only passes the mic through while the track is armed (Auto).</li>
+</ol>
+<p>To record Qimist's notes in Ableton: make a MIDI track with an instrument, set its <b>MIDI From</b> to the Qimist track and choose <i>Qimist</i> in the second box, then arm it and record. Or use <span class="ui">EXPORT .MID</span> and drag the file in.</p>
+<h3>The app hears nothing</h3>
+<ul>
+  <li><b>Windows / macOS</b>: Qimist uses the system's default mic. Set it in the sound settings, and on macOS allow microphone access (System Settings → Privacy &amp; Security → Microphone). If your mic doesn't run at 48 kHz, start the app with <code>--sample-rate 44100</code>, or choose a mic with <code>--input-device "name"</code> (a wrong name lists the devices).</li>
+  <li><b>Linux</b>: start it with the <code>qimist</code> command (or the menu entry), which connects the first mic automatically. Otherwise connect it in qpwgraph.</li>
+</ul>
+<h3>Crackles in the app on Linux</h3>
+<p>Use bigger audio buffers: <code>QIMIST_BUFFER=256 qimist</code>.</p>
+<h3>Notes jump an octave</h3>
+<p>Set <span class="ui">VOICE RANGE</span> to your voice and run <span class="ui">CALIBRATE</span>.</p>
+<h3>Windows says "unknown publisher"</h3>
+<p>Qimist isn't code-signed yet. Click <b>More info → Run anyway</b>.</p>
+<h3>The plugin doesn't show up in my DAW</h3>
+<p>Rescan plugins in the DAW's settings and check it scans the VST3/CLAP folders listed under <a href="#install">Install</a>.</p>
+
+<footer>Qimist is free software under the GNU GPL v3 (see LICENSE.txt). Built with nih-plug and egui.</footer>
+</div>
+</body>
+</html>
